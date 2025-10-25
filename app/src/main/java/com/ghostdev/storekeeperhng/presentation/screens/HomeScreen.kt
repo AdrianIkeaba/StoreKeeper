@@ -60,12 +60,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.ghostdev.storekeeperhng.R
 import com.ghostdev.storekeeperhng.domain.model.Product
 import com.ghostdev.storekeeperhng.presentation.home.HomeViewModel
 import com.ghostdev.storekeeperhng.util.Formatters
@@ -555,7 +557,7 @@ private fun EmptyState(onAddClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    Icons.Default.Inventory2,
+                    painter = painterResource(R.drawable.store_logo),
                     contentDescription = null,
                     modifier = Modifier.size(56.dp),
                     tint = Color.Black.copy(alpha = 0.6f)
