@@ -14,8 +14,7 @@ A modern, lightweight Android app to manage a small store’s inventory. Built w
 - [Project Structure](#project-structure)
 - [Notable Implementation Details](#notable-implementation-details)
 - [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
+- [Links](#links)
 
 
 ## Features
@@ -152,3 +151,10 @@ Key files:
   - The app cache-busts Coil requests; if you still see stale images, force-stop and reopen
 - Build errors on older toolchains
   - Ensure Android Studio and AGP match the versions defined in `gradle/libs.versions.toml`
+
+
+## Links
+- Release build
+  - (Check release tab)
+- Demo video
+  - 
