@@ -157,4 +157,4 @@ Key files:
 - Release build
   - (Check release tab)
 - Demo video
-  - 
+  - https://drive.google.com/file/d/1BSzmspeNAt5jtSpRpESRYgP8Iop91LGj/view?usp=sharing
