@@ -6,7 +6,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import org.koin.androidx.compose.get
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -24,13 +27,41 @@ fun AppNavGraph(
 ) {
     NavHost(navController = navController, startDestination = Route.Splash.route, modifier = modifier) {
         composable(Route.Splash.route) {
-            SplashScreen(onFinished = { navController.navigate(Route.Home.route) { popUpTo(Route.Splash.route) { inclusive = true } } })
+            val prefs = org.koin.androidx.compose.get<com.ghostdev.storekeeperhng.data.prefs.ProfilePrefs>()
+            val firstRun by prefs.firstRun.collectAsState(initial = true)
+            SplashScreen(
+                onFinished = {
+                    if (firstRun) {
+                        navController.navigate(Route.Onboarding.route) {
+                            popUpTo(Route.Splash.route) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(Route.Main.route) {
+                            popUpTo(Route.Splash.route) { inclusive = true }
+                        }
+                    }
+                }
+            )
         }
-        composable(Route.Home.route) {
-            HomeScreen(
+        composable(Route.Onboarding.route) {
+            com.ghostdev.storekeeperhng.presentation.screens.OnboardingScreen(
+                onCompleted = {
+                    navController.navigate(Route.Main.route) {
+                        popUpTo(Route.Onboarding.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(Route.Main.route) {
+            com.ghostdev.storekeeperhng.presentation.screens.MainScreen(
                 onAddClick = { navController.navigate(Route.AddProduct.route) },
                 onItemClick = { id -> navController.navigate(Route.Detail.create(id)) },
-                onEditClick = { id -> navController.navigate(Route.EditProduct.create(id)) }
+                onEditClick = { id -> navController.navigate(Route.EditProduct.create(id)) },
+                onResetToSplash = {
+                    navController.navigate(Route.Splash.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             )
         }
         composable(Route.AddProduct.route) {

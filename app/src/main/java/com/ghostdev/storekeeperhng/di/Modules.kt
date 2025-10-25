@@ -30,6 +30,7 @@ val databaseModule = module {
 
 val repositoryModule = module {
     single<ProductRepository> { ProductRepositoryImpl(get()) }
+    single { com.ghostdev.storekeeperhng.data.prefs.ProfilePrefs(androidContext()) }
 }
 
 val useCaseModule = module {

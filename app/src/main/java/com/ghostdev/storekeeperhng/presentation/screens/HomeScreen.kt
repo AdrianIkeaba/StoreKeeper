@@ -68,11 +68,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.ghostdev.storekeeperhng.R
+import com.ghostdev.storekeeperhng.data.prefs.ProfilePrefs
 import com.ghostdev.storekeeperhng.domain.model.Product
 import com.ghostdev.storekeeperhng.presentation.home.HomeViewModel
 import com.ghostdev.storekeeperhng.util.Formatters
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,12 +88,18 @@ fun HomeScreen(
     val query by vm.query.collectAsState()
     var pendingDeleteId by remember { mutableStateOf<Long?>(null) }
 
+    val prefs = koinInject<ProfilePrefs>()
+    val storeName by prefs.storeName.collectAsState(initial = "")
+    val savedCategories by prefs.categories.collectAsState(initial = emptySet())
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
+                    val title = if (storeName.isNotBlank()) "$storeName inventory" else "Inventory"
                     Text(
-                        "Inventory",
+                        title,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = (-0.5).sp
@@ -168,6 +176,31 @@ fun HomeScreen(
 
             Spacer(Modifier.height(20.dp))
 
+            // Category filter row
+            val categoriesList = savedCategories.toList().sorted()
+            if (categoriesList.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .border(0.dp, Color.Transparent),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        text = "All",
+                        selected = selectedCategory == null,
+                        onClick = { selectedCategory = null }
+                    )
+                    categoriesList.forEach { cat ->
+                        FilterChip(
+                            text = cat,
+                            selected = selectedCategory == cat,
+                            onClick = { selectedCategory = if (selectedCategory == cat) null else cat }
+                        )
+                    }
+                }
+            }
+
             if (state.isLoading) {
                 Box(
                     modifier = Modifier
@@ -191,8 +224,9 @@ fun HomeScreen(
                     color = Color.Black,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
+                val filteredList = state.products.filter { p -> selectedCategory == null || p.category == selectedCategory }
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(state.products) { product ->
+                    items(filteredList) { product ->
                         ProductCard(
                             product,
                             onClick = { onItemClick(product.id) },
@@ -542,6 +576,30 @@ private fun ProductCard(
 }
 
 
+
+@Composable
+private fun FilterChip(text: String, selected: Boolean, onClick: () -> Unit) {
+    if (selected) {
+        Button(
+            onClick = onClick,
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
+            modifier = Modifier.height(36.dp)
+        ) {
+            Text(text, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold))
+        }
+    } else {
+        OutlinedButton(
+            onClick = onClick,
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black),
+            border = BorderStroke(1.5.dp, Color(0xFFE5E7EB)),
+            modifier = Modifier.height(36.dp)
+        ) {
+            Text(text, color = Color.Black, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium))
+        }
+    }
+}
 
 @Composable
 private fun EmptyState(onAddClick: () -> Unit) {
